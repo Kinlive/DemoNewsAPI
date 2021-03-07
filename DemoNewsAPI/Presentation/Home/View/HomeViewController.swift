@@ -22,6 +22,7 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "Home"
         addSubview()
         bindViewModel()
         
@@ -41,8 +42,8 @@ class HomeViewController: UIViewController {
             print(error)
         }
         
-        viewModel.onNewsLoaded = { news in
-            print("success for datas: \n\(news.count)")
+        viewModel.onNewsLoaded = { [weak self] news in
+            self?.displayListPage(with: news)
         }
         
         viewModel.isLoading = { [weak self] loading in
@@ -59,13 +60,21 @@ private extension HomeViewController {
     
     func layoutConstraint() {
         loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        loadingIndicator.topAnchor.constraint(equalTo: view.topAnchor, constant: 50).isActive = true
+        loadingIndicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50).isActive = true
     }
     
     func indicatorStateOnLoading(_ loading: Bool) {
         DispatchQueue.main.async {
             self.startButton.isEnabled = !loading
             loading ? self.loadingIndicator.startAnimating() : self.loadingIndicator.stopAnimating()
+        }
+    }
+    
+    func displayListPage(with news: News) {
+        let viewModel = DefaultListViewModel(passValue: news)
+        DispatchQueue.main.async {
+            let vc = ListViewController.instantiate(viewModel: viewModel)
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
 }
