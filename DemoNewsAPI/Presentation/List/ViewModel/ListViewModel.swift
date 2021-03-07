@@ -44,7 +44,7 @@ final class DefaultListViewModel: ListViewModel {
         self.passValue = passValue
         
         onSelected = { [weak self] indexPath in
-            print(indexPath)
+            self?.getNew(at: indexPath)
         }
         
         onViewWillAppear = { [weak self] in
@@ -79,5 +79,10 @@ private extension DefaultListViewModel {
             numberState?(passValue.count, passValue.count)
         }
         
+    }
+    
+    func getNew(at indexPath: IndexPath) {
+        let new = passValue[indexPath.row]
+        displayDetail?(new)
     }
 }

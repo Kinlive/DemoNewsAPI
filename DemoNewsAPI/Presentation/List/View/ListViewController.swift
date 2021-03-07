@@ -55,8 +55,8 @@ private extension ListViewController {
     }
     
     func bindViewModel() {
-        viewModel.displayDetail = { new in
-            print(new.title)
+        viewModel.displayDetail = { [weak self] new in
+            self?.toNextPage(with: new)
         }
         
         viewModel.displayNews = { [weak self] news in
@@ -65,6 +65,14 @@ private extension ListViewController {
         
         viewModel.numberState = { [weak self] (current, total) in
             self?.title = "List (\(current)/\(total))"
+        }
+    }
+    
+    func toNextPage(with value: New) {
+        let viewModel = DefaultDetailsViewModel(passValue: value)
+        DispatchQueue.main.async {
+            let vc = DetailsViewController.instantiate(viewModel: viewModel)
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
 }
