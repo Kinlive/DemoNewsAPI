@@ -23,7 +23,7 @@ class ListCell: UICollectionViewCell {
         title.font = .systemFont(ofSize: 18, weight: .semibold)
         return title
     }()
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubviews()
@@ -45,9 +45,9 @@ class ListCell: UICollectionViewCell {
         layoutConstraint()
     }
     
-    func configure(by new: New) {
+    func configure(by new: New, image: UIImage?) {
         titleLabel.text = new.title
-        handleImage(urlStr: new.url)
+        backgroundImageView.image = image
     }
 
 }
@@ -70,8 +70,4 @@ private extension ListCell {
         titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
     }
     
-    func handleImage(urlStr: String) {
-        guard let url = URL(string: urlStr) else { backgroundImageView.image = UIImage(named: "placeholder"); return }
-        backgroundImageView.downloaded(from: url, contentMode: .scaleToFill)
-    }
 }

@@ -66,6 +66,12 @@ private extension ListViewController {
         viewModel.numberState = { [weak self] (current, total) in
             self?.title = "List (\(current)/\(total))"
         }
+        
+        viewModel.onImageDownloaded = { [weak self] index in
+            DispatchQueue.main.async {
+                self?.listCollectionView.reloadItems(at: [IndexPath(row: index, section: 0)])
+            }
+        }
     }
     
     func toNextPage(with value: New) {
@@ -105,7 +111,8 @@ extension ListViewController: UICollectionViewDataSource {
             
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ListCell.identifierName, for: indexPath) as? ListCell else { return UICollectionViewCell() }
         let new = displayNews[indexPath.row]
-        cell.configure(by: new)
+        let task = viewModel.onCellForRow?(indexPath.row)
+        cell.configure(by: new, image: task?.image ?? UIImage(named: "placeholder"))
         
         return cell
     
@@ -113,6 +120,14 @@ extension ListViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         viewModel.onSelected?(indexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        viewModel.onCellWillDisplay?(indexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        viewModel.onCellDidEndDisplay?(indexPath)
     }
 }
 
