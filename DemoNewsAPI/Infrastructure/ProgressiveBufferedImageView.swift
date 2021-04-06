@@ -19,16 +19,20 @@ class ProgressiveBufferedImageView: UIImageView {
     
     fileprivate let queue: OperationQueue = {
         let queue = OperationQueue()
-        //queue.maxConcurrentOperationCount = 1
         return queue
     }()
     
     fileprivate var isFinished: Bool = false
     
-    open var loadedHandler: (() -> Void)?
+    private var drawTimer: Timer?
+    private var downloadImage: UIImage?
     
     deinit {
         session.invalidateAndCancel()
+        if let timer = drawTimer {
+            timer.invalidate()
+            drawTimer = nil
+        }
     }
     
     public override init(frame: CGRect) {
@@ -57,8 +61,19 @@ class ProgressiveBufferedImageView: UIImageView {
             
             guard let cgImage = CGImageSourceCreateImageAtIndex(self.imageSource, 0, nil) else { print("Image could not being created.") ;return }
             
-            DispatchQueue.main.async {
-                self.image = UIImage(cgImage: cgImage)
+            self.downloadImage = UIImage(cgImage: cgImage)
+        }
+    }
+    
+    @objc private func drawImage() {
+        DispatchQueue.main.async {
+            self.image = self.downloadImage
+        }
+        
+        if isFinished {
+            if let timer = drawTimer {
+                timer.invalidate()
+                drawTimer = nil
             }
         }
     }
@@ -76,8 +91,10 @@ extension ProgressiveBufferedImageView: URLSessionDataDelegate {
     }
     
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        
+
         completionHandler(.allow)
+        DispatchQueue.main.async {
+            self.drawTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.drawImage), userInfo: nil, repeats: true)
+        }
     }
-    
 }

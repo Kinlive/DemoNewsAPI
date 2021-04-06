@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Kingfisher
+import PINRemoteImage
 
 class DetailsViewController: UIViewController {
 
@@ -63,6 +65,8 @@ private extension DetailsViewController {
         dateLabel.text = new.date
         //topImageView.load(url: URL(string: new.imageUrl)!)//.downloaded(from: new.imageUrl, contentMode: .scaleToFill, placeholder: new.placeHolder)
         bufferedImageView.load(url: URL(string: new.imageUrl)!)
+        //topImageView.kf.setImage(with: URL(string: new.imageUrl)!)
+        //topImageView.pin_setImage(from: URL(string: new.imageUrl))
         titleLabel.text = new.title
         copyrightLabel.text = new.copyright
         desciptionLabel.text = new.description
